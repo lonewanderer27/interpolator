@@ -5,6 +5,7 @@ specifiers:
   '@types/react-dom': ^18.0.11
   '@vitejs/plugin-react-swc': ^3.0.0
   bootstrap: ^5.2.3
+  bootstrap-icons: ^1.10.5
   react: ^18.2.0
   react-bootstrap: ^2.7.4
   react-dom: ^18.2.0
@@ -13,6 +14,7 @@ specifiers:
 
 dependencies:
   bootstrap: 5.2.3
+  bootstrap-icons: 1.10.5
   react: 18.2.0
   react-bootstrap: 2.7.4_jf7puk66b2eiqxne3oe3xlxkou
   react-dom: 18.2.0_react@18.2.0
@@ -429,6 +431,10 @@ packages:
     transitivePeerDependencies:
       - '@swc/helpers'
     dev: true
+
+  /bootstrap-icons/1.10.5:
+    resolution: {integrity: sha512-oSX26F37V7QV7NCE53PPEL45d7EGXmBgHG3pDpZvcRaKVzWMqIRL9wcqJUyEha1esFtM3NJzvmxFXDxjJYD0jQ==}
+    dev: false
 
   /bootstrap/5.2.3:
     resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
