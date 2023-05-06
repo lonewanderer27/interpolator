@@ -556,7 +556,7 @@ function LagrangePage() {
               )}
               {showP && (
                 <>
-                  <p className="sb-i-up-desc">
+                  <p className="sb-i-up-desc mt-5">
                     <span className="text-[15px] font-medium leading-[35px] underline">
                       Line Graph
                     </span>{" "}
@@ -601,6 +601,19 @@ function LagrangePage() {
                       <ScrollArea.Thumb className="flex-1 bg-mauve10 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                     </ScrollArea.Scrollbar>
                   </ScrollArea.Root>
+                  {mode === modes.PREDEFINED && (
+                    <p className="text-[15px] leading-[35px]">
+                      Source:{" "}
+                      <a
+                        className="underline"
+                        href="https://coinmarketcap.com/currencies/dogecoin/"
+                        target="_blank"
+                        title="Click to open in new tab"
+                      >
+                        https://coinmarketcap.com/currencies/dogecoin/
+                      </a>
+                    </p>
+                  )}
                 </>
               )}
               {showError && (
