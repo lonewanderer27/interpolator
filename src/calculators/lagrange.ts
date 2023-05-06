@@ -33,12 +33,15 @@ function generateFormula(n: number){
 
     wholeFormula += formula;
   }
+  console.log("Formula: ")
+  console.log(wholeFormula)
   return wholeFormula;
 }
 
 function subtituteValues(wholeFormula: string, x: string[], y: string[]) {
   let formulaObj: {[key: string]: string} = {}
   for (let k = 0; k < x.length; k++){
+    console.log("k:", k);
     formulaObj[`x${k}`] = x[k]
     formulaObj[`y${k}`] = y[k]
   }
@@ -48,9 +51,10 @@ function subtituteValues(wholeFormula: string, x: string[], y: string[]) {
   
   for (let key in formulaObj){
     wholeFormula = wholeFormula.replaceAll(key, `(${formulaObj[key]})`)
+    console.log(`${key}: ${formulaObj[key]}`)
   }
 
-  console.log("wholeFormula")
+  console.log("substituted formula")
   console.log(wholeFormula)
   return wholeFormula;
 }
