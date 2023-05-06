@@ -449,9 +449,9 @@ function LagrangePage() {
                         +
                       </Button>
                       <Button
-                        disabled={showP}
-                        variant={showP ? "disabled" : "secondary"}
-                        onClick={showP ? undefined : () => minusP()}
+                        disabled={showP || p == 1}
+                        variant={showP || p == 1 ? "disabled" : "secondary"}
+                        onClick={showP || p == 1 ? undefined : () => minusP()}
                         size="sm"
                         className="ml-1"
                         title={
