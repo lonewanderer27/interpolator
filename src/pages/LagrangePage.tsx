@@ -530,8 +530,8 @@ function LagrangePage() {
                     {n <= 7 && (
                       <>
                         <span className="text-[15px] font-medium leading-[35px] underline">
-                          Final Polynomial / Expression
-                        </span>
+                          Polynomial / Expression
+                        </span>{" "}
                         <span>(scroll to see the whole part)</span>
                       </>
                     )}
