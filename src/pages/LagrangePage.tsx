@@ -92,19 +92,19 @@ function LagrangePage() {
     //   setLagrangeSolveReturns(() => solve(n, xVars, yVars, pVars));
     //   setShowP((prev) => !prev);
     // }
-    if (mode === modes.PREDEFINED) {
-      let pxAnswers = useXes(PMs_string, pVars);
-      setLagrangeSolveReturns({
-        wholeFormula: PMwholeFormula,
-        s_string: PMs_string,
-        s_tex: PMs_tex,
-        s_html: PMs_html,
-        pxAnswers: pxAnswers,
-      });
-    } else {
-      setLagrangeSolveReturns(solve(n, xVars, yVars, pVars));
-    }
-
+    // if (mode === modes.PREDEFINED) {
+    //   let pxAnswers = useXes(PMs_string, pVars);
+    //   setLagrangeSolveReturns({
+    //     wholeFormula: PMwholeFormula,
+    //     s_string: PMs_string,
+    //     s_tex: PMs_tex,
+    //     s_html: PMs_html,
+    //     pxAnswers: pxAnswers,
+    //   });
+    // } else {
+    //   setLagrangeSolveReturns(solve(n, xVars, yVars, pVars));
+    // }
+    setLagrangeSolveReturns(solve(n, xVars, yVars, pVars));
     setShowP((prev) => !prev);
   };
 
@@ -237,7 +237,7 @@ function LagrangePage() {
       }
       setXVars(() => PMxVars);
       setYVars(() => PMyVars);
-      setN(12);
+      setN(10);
       setP(1);
       setPVars(["2"]);
       return modes.PREDEFINED;
@@ -527,16 +527,30 @@ function LagrangePage() {
               {showP && (
                 <div className="my-3">
                   <p className="sb-i-up-desc">
-                    <span className="text-[15px] font-medium leading-[35px] underline">
-                      Final Polynomial / Expression
-                    </span>{" "}
-                    (scroll to see the whole part)
+                    {n <= 10 && (
+                      <>
+                        <span className="text-[15px] font-medium leading-[35px] underline">
+                          Final Polynomial / Expression
+                        </span>
+                        <span>(scroll to see the whole part)</span>
+                      </>
+                    )}
+                    {n > 10 && (
+                      <>
+                        <span className="text-[15px] font-medium leading-[35px] underline">
+                          Lagrange Formula
+                          <br />
+                          (Simplified polynomial not shown due to technical
+                          limitation)
+                        </span>
+                      </>
+                    )}
                   </p>
-                  <p
+                  {/* <p
                     dangerouslySetInnerHTML={{
                       __html: lagrangeSolveReturns!.s_html,
                     }}
-                  ></p>
+                  ></p> */}
                   <TeX math={lagrangeSolveReturns!.s_tex}></TeX>
                 </div>
               )}

@@ -22,7 +22,7 @@ export interface GlobalContextInterface {
 }
 
 export interface PxAnsInterface {
-  [key: string]: number
+  [key: string]: bigint
 }
 
 export interface lagrangeSolveReturns {

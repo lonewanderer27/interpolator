@@ -1,5 +1,5 @@
 import { PxAnsInterface, lagrangeSolveReturns } from '../interfaces';
-import { evaluate, parser, simplify } from 'mathjs';
+import math, { evaluate, parse, parser, simplify } from 'mathjs';
 
 function generateFormulaParts(currentN: number, n: number){
   let topPart = ""
@@ -61,15 +61,22 @@ export default function solve(n: number, x: string[], y: string[], pVars: string
 
   const wholeFormula = generateFormula(n-1)
 
-  const s = simplify(subtituteValues(wholeFormula, x, y));
-  const s_string = s.toString()
-  const s_tex = s.toTex();
-  const s_html = s.toHTML();
+  let s = null;
+  let s_string = "";
+  let s_tex = "";
+  let s_html = ""
+  if (n <= 7) {
+    s = simplify(subtituteValues(wholeFormula, x, y));
+    s_string = s.toString()
+    s_tex = s.toTex();
+    s_html = s.toHTML();
+  } else {
+    s_string = subtituteValues(wholeFormula, x, y)
+    s = parse(s_string)
+    s_tex = s.toTex();
+    s_html = s.toHTML();
+  }
   
-  const p = parser();
-  p.evaluate(`f(x) = ${s_string}`)
-  const useX = p.get('f')
-
   let pxAnswers = useXes(s_string, pVars);
 
   return {
@@ -88,7 +95,7 @@ export function useXes(s_string: string, pVars: string[]) {
 
   let pxAnswers: PxAnsInterface[] = []
   pVars.forEach((pVar, i) => {
-    const answer = useX(pVar)
+    const answer: bigint = useX(pVar)
     let obj: PxAnsInterface = {};
     const key = `P(${pVar})`;
     obj[key] = answer; 
