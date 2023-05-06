@@ -297,7 +297,7 @@ function LagrangePage() {
                           disabled={showP || mode === modes.PREDEFINED}
                           title={
                             showP
-                              ? "Click the Resolve button enable this button"
+                              ? "Click the Change Values button enable this button"
                               : "Click to add coordinate"
                           }
                           required
@@ -318,7 +318,7 @@ function LagrangePage() {
                         className="ml-1"
                         title={
                           showP
-                            ? "Click the Resolve button enable this button"
+                            ? "Click the Change Values button enable this button"
                             : "Click to add coordinate"
                         }
                       >
@@ -339,7 +339,7 @@ function LagrangePage() {
                         className="ml-1"
                         title={
                           showP
-                            ? "Click the Resolve button enable this button"
+                            ? "Click the Change Values button enable this button"
                             : "Click to add coordinate"
                         }
                       >
@@ -368,7 +368,7 @@ function LagrangePage() {
                                 disabled={showP || mode === modes.PREDEFINED}
                                 title={
                                   showP
-                                    ? "Click the Resolve button modify this value"
+                                    ? "Click the Change Values button modify this value"
                                     : ""
                                 }
                                 required
@@ -396,7 +396,7 @@ function LagrangePage() {
                               disabled={showP || mode === modes.PREDEFINED}
                               title={
                                 showP
-                                  ? "Click the Resolve button modify this value"
+                                  ? "Click the Change Values button modify this value"
                                   : ""
                               }
                               required
@@ -428,7 +428,7 @@ function LagrangePage() {
                           min={1}
                           title={
                             showP
-                              ? "Click the Resolve button modify this value"
+                              ? "Click the Change Values button modify this value"
                               : ""
                           }
                           required
@@ -442,7 +442,7 @@ function LagrangePage() {
                         className="ml-1"
                         title={
                           showP
-                            ? "Click the Resolve button enable this button"
+                            ? "Click the Change Values button enable this button"
                             : "Click to add P(x) variable"
                         }
                       >
@@ -456,7 +456,7 @@ function LagrangePage() {
                         className="ml-1"
                         title={
                           showP
-                            ? "Click the Resolve button enable this button"
+                            ? "Click the Change Values button enable this button"
                             : "Click to add P(x) variable"
                         }
                       >
@@ -483,7 +483,7 @@ function LagrangePage() {
                             disabled={showP}
                             title={
                               showP
-                                ? "Click the Resolve button modify this value"
+                                ? "Click the Change Values button modify this value"
                                 : ""
                             }
                             required
@@ -498,7 +498,7 @@ function LagrangePage() {
                     size="sm"
                     onClick={toggleShowP}
                   >
-                    {showP ? "Resolve" : "Solve"}
+                    {showP ? "Change values" : "Solve"}
                   </Button>
                 </Form.Root>
 
@@ -527,7 +527,7 @@ function LagrangePage() {
               {showP && (
                 <div className="my-3">
                   <p className="sb-i-up-desc">
-                    {n <= 10 && (
+                    {n <= 7 && (
                       <>
                         <span className="text-[15px] font-medium leading-[35px] underline">
                           Final Polynomial / Expression
@@ -535,7 +535,7 @@ function LagrangePage() {
                         <span>(scroll to see the whole part)</span>
                       </>
                     )}
-                    {n > 10 && (
+                    {n > 7 && (
                       <>
                         <span className="text-[15px] font-medium leading-[35px] underline">
                           Lagrange Formula
