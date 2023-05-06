@@ -22,12 +22,11 @@ export interface GlobalContextInterface {
 }
 
 export interface PxAnsInterface {
-  [key: string]: BigInt
+  [key: string]: number
 }
 
 export interface lagrangeSolveReturns {
   wholeFormula: string;
-  s: math.MathNode;
   s_string: string;
   s_tex: string;
   s_html: string | TrustedHTML;
@@ -36,10 +35,10 @@ export interface lagrangeSolveReturns {
 
 export interface lagrangeVerifyReturns {
   success: boolean,
-  reasons: lagrangeReasons
+  reasons: lagrangeVerifyReasons
 }
 
-export interface lagrangeReasons {
+export interface lagrangeVerifyReasons {
   n: string[],
   x: string[],
   y: string[],

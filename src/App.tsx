@@ -65,10 +65,10 @@ function App() {
       }}
     >
       <div className="App row">
-        <div className="col-12 col-lg-4">
+        <div className="col-12 col-lg-3">
           <SideBar />
         </div>
-        <div className="col-12 col-lg-8">
+        <div className="col-12 col-lg-9">
           {page === pages.LAGRANGE && <LagrangePage />}
           {page === pages.NEWTON && <NewtonPage />}
           {page === pages.ABOUT_US && <AboutUsPage />}

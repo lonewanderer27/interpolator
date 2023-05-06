@@ -4,14 +4,46 @@ import * as Form from "@radix-ui/react-form";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Switch from "@radix-ui/react-switch";
 
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
+import {
+  PMlabels,
+  PMlineChartTitle,
+  PMs_html,
+  PMs_string,
+  PMs_tex,
+  PMwholeFormula,
+  PMxVars,
+  PMyVars,
+} from "../constants";
 import React, { useContext, useState } from "react";
+import { lagrangeVerifyReasons, lagrangeVerifyReturns } from "../interfaces";
+import solve, { useXes } from "../calculators/lagrange";
 
 import Button from "../components/Button";
 import { GlobalState } from "../App";
-import PolrsButtonProps from "../interfaces";
+import { Line } from "react-chartjs-2";
 import TeX from "@matejmazur/react-katex";
 import { modes } from "../enums";
-import solve from "../calculators/lagrange";
+import { verify } from "../verifiers/lagrange";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 function LagrangePage() {
   const {
@@ -35,9 +67,44 @@ function LagrangePage() {
   console.table(lagrangeSolveReturns);
 
   const [showP, setShowP] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
+  const [errorReasons, setErrorReasons] = useState<lagrangeVerifyReasons>({
+    n: [],
+    x: [],
+    y: [],
+    p: [],
+    pVars: [],
+  });
 
   const toggleShowP = () => {
-    setLagrangeSolveReturns(() => solve(n, xVars, yVars, pVars));
+    // setShowError(false);
+
+    // const lagrangeVerifyReturns: lagrangeVerifyReturns = verify(
+    //   n,
+    //   xVars,
+    //   yVars,
+    //   pVars
+    // );
+    // if (lagrangeVerifyReturns.success === false) {
+    //   setErrorReasons(lagrangeVerifyReturns.reasons);
+    //   setShowError(true);
+    // } else {
+    //   setLagrangeSolveReturns(() => solve(n, xVars, yVars, pVars));
+    //   setShowP((prev) => !prev);
+    // }
+    if (mode === modes.PREDEFINED) {
+      let pxAnswers = useXes(PMs_string, pVars);
+      setLagrangeSolveReturns({
+        wholeFormula: PMwholeFormula,
+        s_string: PMs_string,
+        s_tex: PMs_tex,
+        s_html: PMs_html,
+        pxAnswers: pxAnswers,
+      });
+    } else {
+      setLagrangeSolveReturns(solve(n, xVars, yVars, pVars));
+    }
+
     setShowP((prev) => !prev);
   };
 
@@ -125,7 +192,7 @@ function LagrangePage() {
     setXVars((prev) => {
       let newVal = prev;
       if (newN > n) {
-        newVal = [...prev, "0"];
+        newVal = [...prev, ...Array(newN - n).fill("0")];
       } else {
         newVal = prev.slice(0, newN);
       }
@@ -140,7 +207,7 @@ function LagrangePage() {
     setYVars((prev) => {
       let newVal = prev;
       if (newN > n) {
-        newVal = [...prev, "0"];
+        newVal = [...prev, ...Array(newN - n).fill("0")];
       } else {
         newVal = prev.slice(0, newN);
       }
@@ -156,6 +223,25 @@ function LagrangePage() {
     modifyXVars(newN);
     modifyYVars(newN);
     setN(newN);
+  };
+
+  const handleModeChange = () => {
+    setMode((prev) => {
+      if (prev === modes.PREDEFINED) {
+        // setXVars(() => ["0", "0"]);
+        // setYVars(() => ["0", "0"]);
+        // setN(2);
+        // setP(1);
+        // setPVars(["0"]);
+        return modes.USER_DEFINED;
+      }
+      setXVars(() => PMxVars);
+      setYVars(() => PMyVars);
+      setN(12);
+      setP(1);
+      setPVars(["2"]);
+      return modes.PREDEFINED;
+    });
   };
 
   return (
@@ -179,21 +265,17 @@ function LagrangePage() {
               <Switch.Root
                 className="w-[42px] h-[25px] bg-[#232325] rounded-full relative shadow-[0_2px_10px] shadow-blackA7 focus:shadow-[0_0_0_2px] focus:shadow-black data-[state=checked]:bg-gray outline-none cursor-default"
                 id="airplane-mode"
-                onCheckedChange={() =>
-                  setMode((prev) => {
-                    if (prev === modes.PREDEFINED) return modes.USER_DEFINED;
-                    else return modes.PREDEFINED;
-                  })
-                }
+                disabled={showP}
+                onCheckedChange={() => handleModeChange()}
                 checked={mode === modes.USER_DEFINED ? true : false}
               >
                 <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-[0_2px_2px] shadow-blackA7 transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
               </Switch.Root>
             </div>
           </div>
-          <div className="grid grid-cols-2">
-            <ScrollArea.Root className="w-[95%] max-h-[350px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA7">
-              <ScrollArea.Viewport className="w-full h-full rounded">
+          <ScrollArea.Root className="max-w-[100%] h-[85%] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA7 mt-8">
+            <ScrollArea.Viewport className="w-full h-full rounded">
+              <div className="grid grid-cols-3">
                 <Form.Root
                   className="w-[260px]"
                   onSubmit={(e) => e.preventDefault()}
@@ -212,7 +294,7 @@ function LagrangePage() {
                           onChange={handleNChange}
                           value={n}
                           min={2}
-                          disabled={showP}
+                          disabled={showP || mode === modes.PREDEFINED}
                           title={
                             showP
                               ? "Click the Resolve button enable this button"
@@ -222,8 +304,16 @@ function LagrangePage() {
                         />
                       </Form.Control>
                       <Button
-                        variant={showP ? "disabled" : "secondary"}
-                        onClick={showP ? undefined : () => addN()}
+                        variant={
+                          showP || mode === modes.PREDEFINED
+                            ? "disabled"
+                            : "secondary"
+                        }
+                        onClick={
+                          showP || mode === modes.PREDEFINED
+                            ? undefined
+                            : () => addN()
+                        }
                         size="sm"
                         className="ml-1"
                         title={
@@ -235,8 +325,16 @@ function LagrangePage() {
                         +
                       </Button>
                       <Button
-                        variant={showP || n <= 2 ? "disabled" : "secondary"}
-                        onClick={showP || n <= 2 ? undefined : () => minusN()}
+                        variant={
+                          showP || mode === modes.PREDEFINED || n <= 2
+                            ? "disabled"
+                            : "secondary"
+                        }
+                        onClick={
+                          showP || mode === modes.PREDEFINED || n <= 2
+                            ? undefined
+                            : () => minusN()
+                        }
                         size="sm"
                         className="ml-1"
                         title={
@@ -255,7 +353,7 @@ function LagrangePage() {
                       <div>
                         <span className="w-full flex justify-center mb-1">
                           <Form.Label className="text-[15px] font-medium leading-[35px] text-white">
-                            x coordinates
+                            x-axis
                           </Form.Label>
                         </span>
                         {xVars.map((i, index) => {
@@ -267,7 +365,7 @@ function LagrangePage() {
                                 value={i}
                                 name={`x-${index}`}
                                 onChange={handleVarChange}
-                                disabled={showP}
+                                disabled={showP || mode === modes.PREDEFINED}
                                 title={
                                   showP
                                     ? "Click the Resolve button modify this value"
@@ -283,7 +381,7 @@ function LagrangePage() {
                       <div>
                         <span className="w-full flex justify-center mb-1">
                           <Form.Label className="text-[15px] font-medium leading-[35px] text-white">
-                            y coordinates
+                            y-axis
                           </Form.Label>
                         </span>
                         {yVars.map((i, index) => (
@@ -295,7 +393,7 @@ function LagrangePage() {
                               value={i}
                               name={`y-${index}`}
                               onChange={handleVarChange}
-                              disabled={showP}
+                              disabled={showP || mode === modes.PREDEFINED}
                               title={
                                 showP
                                   ? "Click the Resolve button modify this value"
@@ -309,17 +407,7 @@ function LagrangePage() {
                     </div>
                   </Form.Field>
                 </Form.Root>
-              </ScrollArea.Viewport>
-              <ScrollArea.Scrollbar
-                className="flex select-none touch-none p-0.5 bg-blackA6 transition-colors duration-[160ms] ease-out hover:bg-blackA8 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
-                orientation="vertical"
-              >
-                <ScrollArea.Thumb className="flex-1 bg-mauve10 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
-              </ScrollArea.Scrollbar>
-            </ScrollArea.Root>
 
-            <ScrollArea.Root className="w-[95%] max-h-[350px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA7">
-              <ScrollArea.Viewport className="w-full h-full rounded">
                 <Form.Root
                   className="w-[260px]"
                   onSubmit={(e) => e.preventDefault()}
@@ -338,7 +426,6 @@ function LagrangePage() {
                           onChange={handlePnChange}
                           value={p}
                           min={1}
-                          disabled={showP}
                           title={
                             showP
                               ? "Click the Resolve button modify this value"
@@ -348,6 +435,7 @@ function LagrangePage() {
                         />
                       </Form.Control>
                       <Button
+                        disabled={showP}
                         variant={showP ? "disabled" : "secondary"}
                         onClick={showP ? undefined : () => addP()}
                         size="sm"
@@ -361,8 +449,9 @@ function LagrangePage() {
                         +
                       </Button>
                       <Button
-                        variant={showP || p <= 1 ? "disabled" : "secondary"}
-                        onClick={showP || p <= 1 ? undefined : () => minusP()}
+                        disabled={showP}
+                        variant={showP ? "disabled" : "secondary"}
+                        onClick={showP ? undefined : () => minusP()}
                         size="sm"
                         className="ml-1"
                         title={
@@ -412,39 +501,154 @@ function LagrangePage() {
                     {showP ? "Resolve" : "Solve"}
                   </Button>
                 </Form.Root>
-              </ScrollArea.Viewport>
-              <ScrollArea.Scrollbar
-                className="flex select-none touch-none p-0.5 bg-blackA6 transition-colors duration-[160ms] ease-out hover:bg-blackA8 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
-                orientation="vertical"
-              >
-                <ScrollArea.Thumb className="flex-1 bg-mauve10 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
-              </ScrollArea.Scrollbar>
-            </ScrollArea.Root>
-          </div>
 
-          {showP && (
-            <ScrollArea.Root className="w-[95%] max-h-[300px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA7 mt-8">
-              <ScrollArea.Viewport className="w-full h-full rounded">
-                <div className="grid grid-cols-2 mb-4">
-                  <p className="sb-i-up-desc">Final Polynomial / Expression</p>
-                  <TeX math={lagrangeSolveReturns!.s_tex} block></TeX>
-                </div>
-                <div className="grid grid-cols-2 mb-4">
-                  <p className="sb-i-up-desc">P(x) results</p>
+                {showP && (
                   <div>
-                    {lagrangeSolveReturns!.pxAnswers.map((PxAns) => {
-                      return (
-                        <div className="grid grid-cols-2">
-                          <p>{Object.keys(PxAns).toString()} =</p>
-                          <p>{Object.values(PxAns).toString()}</p>
-                        </div>
-                      );
-                    })}
+                    <p className="text-[15px] font-medium leading-[35px] sb-i-up-desc underline">
+                      P(x) results
+                    </p>
+                    <div>
+                      {lagrangeSolveReturns!.pxAnswers.map((PxAns) => {
+                        return (
+                          <div>
+                            <p>
+                              {Object.keys(PxAns).toString()} ={" "}
+                              {Object.values(PxAns).toString()}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
+                )}
+              </div>
+
+              {/* the answers only show if there's no error */}
+              {showP && (
+                <div className="my-3">
+                  <p className="sb-i-up-desc">
+                    <span className="text-[15px] font-medium leading-[35px] underline">
+                      Final Polynomial / Expression
+                    </span>{" "}
+                    (scroll to see the whole part)
+                  </p>
+                  <p
+                    dangerouslySetInnerHTML={{
+                      __html: lagrangeSolveReturns!.s_html,
+                    }}
+                  ></p>
+                  <TeX math={lagrangeSolveReturns!.s_tex}></TeX>
                 </div>
-              </ScrollArea.Viewport>
-            </ScrollArea.Root>
-          )}
+              )}
+              {showP && (
+                <>
+                  <p className="sb-i-up-desc">
+                    <span className="text-[15px] font-medium leading-[35px] underline">
+                      Line Graph
+                    </span>{" "}
+                    (scroll to see the whole part)
+                  </p>
+                  <ScrollArea.Root className="max-w-[100%] h-[500px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA7 mt-8">
+                    <ScrollArea.Viewport className="w-full h-full rounded">
+                      <Line
+                        width={700}
+                        height={500}
+                        options={{
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: "top" as const,
+                            },
+                            title: {
+                              display: true,
+                              text:
+                                mode === modes.PREDEFINED
+                                  ? PMlineChartTitle
+                                  : "Line Chart",
+                            },
+                          },
+                        }}
+                        data={{
+                          labels: mode === modes.PREDEFINED ? PMlabels : xVars,
+                          datasets: [
+                            {
+                              label: "y",
+                              data: yVars,
+                              borderColor: "green",
+                            },
+                          ],
+                        }}
+                      />
+                    </ScrollArea.Viewport>
+                    <ScrollArea.Scrollbar
+                      className="flex select-none touch-none p-0.5 bg-blackA6 transition-colors duration-[160ms] ease-out hover:bg-blackA8 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                      orientation="vertical"
+                    >
+                      <ScrollArea.Thumb className="flex-1 bg-mauve10 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                    </ScrollArea.Scrollbar>
+                  </ScrollArea.Root>
+                </>
+              )}
+              {showError && (
+                <ScrollArea.Root className="w-[100%] max-h-[300px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA7 mt-8">
+                  <ScrollArea.Viewport className="w-full h-full rounded">
+                    {errorReasons.n.length > 1 && (
+                      <div className="grid grid-cols-2 mb-4">
+                        <p className="sb-i-up-desc">n Error</p>
+                        <div>
+                          {errorReasons.n.map((reason) => {
+                            return <p>{reason}</p>;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {errorReasons.x.length > 1 && (
+                      <div className="grid grid-cols-2 mb-4">
+                        <p className="sb-i-up-desc">x Error</p>
+                        <div>
+                          {errorReasons.x.map((reason) => {
+                            return <p>{reason}</p>;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {errorReasons.y.length > 1 && (
+                      <div className="grid grid-cols-2 mb-4">
+                        <p className="sb-i-up-desc">y Error</p>
+                        <div>
+                          {errorReasons.y.map((reason) => {
+                            return <p>{reason}</p>;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {errorReasons.p.length > 1 && (
+                      <div className="grid grid-cols-2 mb-4">
+                        <p className="sb-i-up-desc">P(x) Error</p>
+                        <div>
+                          {errorReasons.p.map((reason) => {
+                            return <p>{reason}</p>;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </ScrollArea.Viewport>
+                </ScrollArea.Root>
+              )}
+            </ScrollArea.Viewport>
+            <ScrollArea.Scrollbar
+              className="flex select-none touch-none p-0.5 bg-blackA6 transition-colors duration-[160ms] ease-out hover:bg-blackA8 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+              orientation="vertical"
+            >
+              <ScrollArea.Thumb className="flex-1 bg-mauve10 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Scrollbar
+              className="flex select-none touch-none p-0.5 bg-blackA6 transition-colors duration-[160ms] ease-out hover:bg-blackA8 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+              orientation="horizontal"
+            >
+              <ScrollArea.Thumb className="flex-1 bg-mauve10 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+            </ScrollArea.Scrollbar>
+          </ScrollArea.Root>
         </div>
       </div>
     </div>

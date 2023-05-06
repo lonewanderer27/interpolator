@@ -30,9 +30,8 @@ function generateFormula(n: number){
     else {
       formula += ` * y${j} + `
     }
-    
+
     wholeFormula += formula;
-    console.log(formula)
   }
   return wholeFormula;
 }
@@ -51,6 +50,7 @@ function subtituteValues(wholeFormula: string, x: string[], y: string[]) {
     wholeFormula = wholeFormula.replaceAll(key, `(${formulaObj[key]})`)
   }
 
+  console.log("wholeFormula")
   console.log(wholeFormula)
   return wholeFormula;
 }
@@ -70,21 +70,29 @@ export default function solve(n: number, x: string[], y: string[], pVars: string
   p.evaluate(`f(x) = ${s_string}`)
   const useX = p.get('f')
 
-  let pxAnswers: PxAnsInterface[] = []
-  pVars.forEach((pVar, i) => {
-    const answer: BigInt = useX(pVar)
-    let obj: PxAnsInterface = {};
-    const key = `P(${pVar})`;
-    obj[key] = answer; 
-    pxAnswers.push(obj)
-  })
+  let pxAnswers = useXes(s_string, pVars);
 
   return {
     wholeFormula,
-    s,
     s_string,
     s_tex,
     s_html,
     pxAnswers
   }
+}
+
+export function useXes(s_string: string, pVars: string[]) {
+  const p = parser();
+  p.evaluate(`f(x) = ${s_string}`)
+  const useX = p.get('f')
+
+  let pxAnswers: PxAnsInterface[] = []
+  pVars.forEach((pVar, i) => {
+    const answer = useX(pVar)
+    let obj: PxAnsInterface = {};
+    const key = `P(${pVar})`;
+    obj[key] = answer; 
+    pxAnswers.push(obj)
+  })
+  return pxAnswers;
 }
